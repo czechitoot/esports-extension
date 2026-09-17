@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "NSeSA Helper",
   "version": "0.1.0",
-  "description": "Unofficial NSeSA extension for improving the usability of Fenworks.",
+  "description": "An unofficial NSeSA extension with quality of life improvements for Esports matches and improving the usability of Fenworks.",
   "permissions": [
     "storage"
   ],

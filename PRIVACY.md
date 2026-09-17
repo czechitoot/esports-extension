@@ -1,6 +1,6 @@
 # Permissions and privacy
 
-NSeSA Helper is an unofficial extension for improving the usability of Fenworks.
+NSeSA Helper is an unofficial NSeSA extension with quality of life improvements for Esports matches and improving the usability of Fenworks.
 
 ## What it can access
 

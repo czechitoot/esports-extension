@@ -1,6 +1,6 @@
 # NSeSA Helper
 
-Unofficial NSeSA extension for improving the usability of Fenworks.
+An unofficial NSeSA extension with quality of life improvements for Esports matches and improving the usability of Fenworks.
 
 ![NSeSA Helper icon](icons/icon128.png)
 
