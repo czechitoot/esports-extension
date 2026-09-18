@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.1 (unreleased)
+## 0.1.1
 
 - Rebranded as Esports Helper with a generic gaming identity.
 - Simplified documentation and retained the existing site access restriction.
