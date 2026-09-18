@@ -6,7 +6,7 @@ Esports Helper is an independent, unofficial extension. It is not affiliated wit
 
 Esports Helper is provided as is, without warranty. Install and use it at your own risk. No support is provided, and continued compatibility or future updates are not guaranteed.
 
-## Get
+## Installation
 
 [Get the Esports Helper extension!](https://chromewebstore.google.com/detail/ijoihdmdnameopfehjlbcjlbpmebknfe)
 
