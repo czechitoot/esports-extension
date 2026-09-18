@@ -1,5 +1,13 @@
 /* Shared by extension pages and the isolated content script. */
-globalThis.NSeSA = (() => {
+globalThis.EsportsHelper = (() => {
+  const matchSite = new URL(chrome.runtime.getManifest().content_scripts[0].matches[0].replace('*', ''));
+  function bookmarkName(bookmark) {
+    const url = new URL(bookmark.url);
+    // Rebrand the original default shortcut while preserving customized labels.
+    const originalLabel = matchSite.hostname.split('.').at(-2);
+    return url.origin === matchSite.origin && url.pathname === '/' &&
+      bookmark.name.trim().toLowerCase() === originalLabel ? 'Match dashboard' : bookmark.name.trim();
+  }
   const defaults = {
     games: [
       {title: 'Super Smash Bros Ultimate', color: '#E6D5F7'},
@@ -15,7 +23,7 @@ globalThis.NSeSA = (() => {
     unsquish: true,
     colorMatches: true,
     bookmarks: [
-      {name: 'Fenworks', url: 'https://app.fenworks.com'},
+      {name: 'Match dashboard', url: matchSite.origin},
       {name: 'Smash Helper', url: 'https://smashhelper.link'}
     ]
   };
@@ -29,7 +37,7 @@ globalThis.NSeSA = (() => {
     if (!value || typeof value !== 'object') value = {};
     return {
       games: Array.isArray(value.games) ? value.games.filter(g => g && typeof g.title === 'string' && normalize(g.title) && /^#[\da-f]{6}$/i.test(g.color)).map(g => ({title: g.title.trim(), color: g.color})) : structuredClone(defaults.games),
-      bookmarks: Array.isArray(value.bookmarks) ? value.bookmarks.filter(b => b && typeof b.name === 'string' && b.name.trim() && safeURL(b.url)).map(b => ({name: b.name.trim(), url: b.url})) : structuredClone(defaults.bookmarks),
+      bookmarks: Array.isArray(value.bookmarks) ? value.bookmarks.filter(b => b && typeof b.name === 'string' && b.name.trim() && safeURL(b.url)).map(b => ({name: bookmarkName(b), url: b.url})) : structuredClone(defaults.bookmarks),
       linkify: typeof value.linkify === 'boolean' ? value.linkify : true,
       moveChat: typeof value.moveChat === 'boolean' ? value.moveChat : false,
       unsquish: typeof value.unsquish === 'boolean' ? value.unsquish : true,

@@ -1,5 +1,5 @@
 'use strict';
-const api = globalThis.NSeSA;
+const api = globalThis.EsportsHelper;
 const status = document.getElementById('status');
 const form = document.getElementById('settings-form');
 function field(labelText, type, value) {
@@ -40,7 +40,7 @@ form.addEventListener('submit', async event => {
   const save = document.getElementById('save-settings'); save.disabled = true;
   try {
     await chrome.storage.local.set({settings: {games, bookmarks, linkify: document.getElementById('linkify').checked, moveChat: document.getElementById('moveChat').checked, unsquish: document.getElementById('unsquish').checked, colorMatches: document.getElementById('colorMatches').checked}});
-    status.textContent = 'Saved. Open Fenworks tabs update automatically.';
+    status.textContent = 'Saved. Open supported tabs update automatically.';
   } catch (error) { status.textContent = 'Could not save: ' + error.message; }
   finally { save.disabled = false; }
 });

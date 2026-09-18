@@ -1,19 +1,19 @@
 (() => {
   'use strict';
   if (location.origin !== 'https://app.fenworks.com') return;
-  const api = globalThis.NSeSA;
+  const api = globalThis.EsportsHelper;
   let settings, timer, moved = null;
   const painted = new Set();
   const teamGrids = new Set();
   const teamResize = new ResizeObserver(entries => {
-    for (const entry of entries) entry.target.toggleAttribute('data-nsesa-narrow', entry.contentRect.width < 560);
+    for (const entry of entries) entry.target.toggleAttribute('data-esports-narrow', entry.contentRect.width < 560);
   });
   function roomForTeamNames() {
     const onMatch = settings.unsquish && /^\/match\//i.test(location.pathname);
     for (const grid of teamGrids) {
       if (!grid.isConnected || !onMatch) {
         teamResize.unobserve(grid); teamGrids.delete(grid);
-        grid.removeAttribute('data-nsesa-teams'); grid.removeAttribute('data-nsesa-narrow');
+        grid.removeAttribute('data-esports-teams'); grid.removeAttribute('data-esports-narrow');
       }
     }
     if (!onMatch) return;
@@ -24,8 +24,8 @@
       if (children.length !== 3 || !children[0].querySelector('h2[title]') ||
           !children[2].querySelector('h2[title]') || children[1].textContent.trim() !== '-') continue;
       if (!teamGrids.has(grid)) {
-        teamGrids.add(grid); grid.dataset.nsesaTeams = '';
-        grid.toggleAttribute('data-nsesa-narrow', grid.getBoundingClientRect().width < 560);
+        teamGrids.add(grid); grid.dataset.esportsTeams = '';
+        grid.toggleAttribute('data-esports-narrow', grid.getBoundingClientRect().width < 560);
         teamResize.observe(grid);
       }
     }
@@ -57,15 +57,15 @@
     }
     for (const row of painted) {
       if (!wanted.has(row)) {
-        row.removeAttribute('data-nsesa-row');
-        row.style.removeProperty('--nsesa-color'); row.style.removeProperty('--nsesa-ink');
+        row.removeAttribute('data-esports-row');
+        row.style.removeProperty('--esports-color'); row.style.removeProperty('--esports-ink');
         painted.delete(row);
       }
     }
     for (const [row, color] of wanted) {
-      row.dataset.nsesaRow = '';
-      row.style.setProperty('--nsesa-color', color);
-      row.style.setProperty('--nsesa-ink', ink(color));
+      row.dataset.esportsRow = '';
+      row.style.setProperty('--esports-color', color);
+      row.style.setProperty('--esports-ink', ink(color));
       painted.add(row);
     }
   }
@@ -78,7 +78,7 @@
   }
   function chatLinks() {
     if (!settings.linkify) {
-      for (const a of document.querySelectorAll('a[data-nsesa-link]')) a.replaceWith(document.createTextNode(a.textContent));
+      for (const a of document.querySelectorAll('a[data-esports-link]')) a.replaceWith(document.createTextNode(a.textContent));
       return;
     }
     // Shared message hooks cover match chat and the portal-rendered sidebar.
@@ -101,7 +101,7 @@
         if (!href) continue;
         fragment.append(text.slice(last, match.index));
         const a = document.createElement('a');
-        a.textContent = label; a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.dataset.nsesaLink = '';
+        a.textContent = label; a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.dataset.esportsLink = '';
         // A full-match message is itself a button. Do not open its options menu.
         for (const type of ['click', 'auxclick']) a.addEventListener(type, event => event.stopPropagation());
         a.addEventListener('keydown', event => event.stopPropagation());
@@ -133,7 +133,7 @@
       if (block.parentElement.matches('main, body, #root')) break;
       const details = Array.from(block.parentElement.children).find(sibling => sibling !== block && sibling.querySelector('.match-roster-player-card'));
       if (!details) continue;
-      const marker = document.createComment('NSeSA original chat position');
+      const marker = document.createComment('EsportsHelper original chat position');
       block.before(marker); details.after(block);
       moved = {block, details, marker}; return;
     }
@@ -152,5 +152,5 @@
     if (area === 'local' && changes.settings) { settings = api.clean(changes.settings.newValue); schedule(); }
   });
   window.addEventListener('popstate', schedule);
-  api.load().then(value => { settings = value; run(); }).catch(error => console.warn('NSeSA Helper could not load settings:', error));
+  api.load().then(value => { settings = value; run(); }).catch(error => console.warn('Esports Helper could not load settings:', error));
 })();

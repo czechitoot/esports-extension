@@ -1,10 +1,10 @@
 # Permissions and privacy
 
-NSeSA Helper is an unofficial NSeSA extension with quality of life improvements for Esports matches and improving the usability of Fenworks.
+Esports Helper is an independent extension with quality-of-life improvements for esports matches.
 
 ## What it can access
 
-The content script runs only on `https://app.fenworks.com/*`. On those pages it can read and change the page content, including displayed match information and chat messages. It uses this access to color schedule rows, turn URL text into links, and rearrange the match layout.
+The content script runs only on the supported match site specified in `manifest.json`. On those pages it can read and change the page content, including displayed match information and chat messages. It uses this access to color schedule rows, turn URL text into links, and rearrange the match layout.
 
 The manifest does not request access to other websites, browser history, cookies, downloads, or the clipboard. Opening a bookmark does not grant access to its destination.
 
@@ -25,4 +25,4 @@ The extension has no analytics, tracking, external scripts, or server. Its sourc
 - `popup.html`, `popup.js`: bookmark buttons and opening the settings tab.
 - `icons/icon-source.svg`: editable source for the icon.
 
-There is no bundler, obfuscated code, runtime dependency, or remote code to inspect elsewhere. The shipped JavaScript is the source the browser executes. Public source allows independent review; it is not a security audit or endorsement by Fenworks.
+There is no bundler, obfuscated code, runtime dependency, or remote code to inspect elsewhere. The shipped JavaScript is the source the browser executes. Public source allows independent review; it is not a security audit or endorsement by the services whose pages it enhances.

@@ -1,0 +1,47 @@
+# Local-only workspace: packages, test data, screenshots, and scratch work.
+/local/
+/private/
+/work/
+/outputs/
+/dist/
+/build/
+/artifacts/
+/test-results/
+/playwright-report/
+/coverage/
+
+# Packaged extensions and signing material must never be committed.
+*.zip
+*.xpi
+*.crx
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+updates.xml
+SHA256SUMS.txt
+
+# Credentials and machine-specific configuration.
+.env
+.env.*
+!.env.example
+credentials*.json
+secrets*.json
+.npmrc
+.codex/
+.agents/
+.vscode/
+.idea/
+
+# Dependencies, caches, logs, and OS/editor files.
+node_modules/
+__pycache__/
+*.py[cod]
+.cache/
+*.log
+*.tmp
+*.swp
+*~
+.DS_Store
+Thumbs.db

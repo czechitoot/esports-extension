@@ -3,7 +3,7 @@ document.getElementById('settings').addEventListener('click', () => {
   chrome.tabs.create({url: chrome.runtime.getURL('options.html')}).catch(showError);
 });
 function showError(error) { document.getElementById('status').textContent = 'Could not open: ' + error.message; }
-globalThis.NSeSA.load().then(settings => {
+globalThis.EsportsHelper.load().then(settings => {
   const nav = document.getElementById('bookmarks');
   for (const bookmark of settings.bookmarks) {
     const button = document.createElement('button'); button.type = 'button'; button.textContent = bookmark.name; button.title = bookmark.url;

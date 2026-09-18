@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "NSeSA Helper",
-  "version": "0.1.0",
-  "description": "An unofficial NSeSA extension with quality of life improvements for Esports matches and improving the usability of Fenworks.",
+  "name": "Esports Helper",
+  "version": "0.1.1",
+  "description": "Quality-of-life improvements for esports matches, including game colors, chat links, layout adjustments, and bookmarks.",
   "permissions": [
     "storage"
   ],
@@ -22,7 +22,7 @@
     }
   ],
   "action": {
-    "default_title": "NSeSA Helper",
+    "default_title": "Esports Helper",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",

@@ -1,10 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
-  <title>Blue N wearing a white gaming headset</title>
-  <path d="M27 112V34H48L80 78V34H101V112H80L48 67V112Z" fill="#194F80" stroke="#0D2D4C" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M16 65V53C16 -3 112 -3 112 53V65" fill="none" stroke="#0D2D4C" stroke-width="15" stroke-linecap="round"/>
-  <path d="M16 65V53C16 -3 112 -3 112 53V65" fill="none" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round"/>
-  <rect x="3" y="54" width="31" height="49" rx="9" fill="#FFFFFF" stroke="#0D2D4C" stroke-width="4"/>
-  <rect x="94" y="54" width="31" height="49" rx="9" fill="#FFFFFF" stroke="#0D2D4C" stroke-width="4"/>
-  <path d="M110 102Q110 119 82 119" fill="none" stroke="#0D2D4C" stroke-width="10" stroke-linecap="round"/>
-  <path d="M110 102Q110 119 82 119" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
-</svg>
+<title>Esports Helper white game controller on dark red</title>
+<rect width="128" height="128" rx="26" fill="#922D36"/>
+<g transform="translate(64 64) scale(1.15) translate(-64 -70)">
+<path d="M43 39H85C97 39 103 48 106 61L112 85C115 99 103 106 93 96L79 82H49L35 96C25 106 13 99 16 85L22 61C25 48 31 39 43 39Z" fill="white"/>
+<path d="M39 52V72M29 62H49" stroke="#922D36" stroke-width="7" stroke-linecap="round"/>
+<circle cx="89" cy="55" r="4.5" fill="#922D36"/><circle cx="99" cy="65" r="4.5" fill="#922D36"/><circle cx="79" cy="65" r="4.5" fill="#922D36"/><circle cx="89" cy="75" r="4.5" fill="#922D36"/>
+</g></svg>
