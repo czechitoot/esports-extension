@@ -30,7 +30,7 @@
       }
     }
   }
-  const seasonSelector = 'a[href^="/seasons/view/"], a[href^="https://app.fenworks.com/seasons/view/"]';
+  const seasonSelector = 'a[href^="/seasons/view/"]:not([data-esports-match-link]), a[href^="https://app.fenworks.com/seasons/view/"]:not([data-esports-match-link])';
   const teamSelector = 'a[href^="/teams/"], a[href^="/team/"], a[href^="https://app.fenworks.com/teams/"], a[href^="https://app.fenworks.com/team/"]';
   function ink(hex) {
     const parts = hex.slice(1).match(/../g).map(x => parseInt(x, 16) / 255)
@@ -69,6 +69,114 @@
       painted.add(row);
     }
   }
+  const sortedDays = new Set();
+  function matchDay(group) {
+    const heading = group.firstElementChild;
+    if (!heading?.matches('div.sticky') || !group.querySelector(seasonSelector) ||
+        !group.querySelector(teamSelector)) return null;
+    const match = /^(?:Sun|Mon|Tue|Wed|Thu|Fri|Sat) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{1,2}), (\d{4})$/.exec(heading.textContent.trim());
+    if (!match) return null;
+    const month = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].indexOf(match[1]);
+    const date = new Date(Date.UTC(Number(match[3]), month, Number(match[2])));
+    return date.getUTCMonth() === month && date.getUTCDate() === Number(match[2]) ? date.getTime() : null;
+  }
+  function orderPastDays() {
+    const wanted = new Set();
+    if (settings.newestPastDays && !/^\/match\//i.test(location.pathname)) {
+      for (const tabs of document.querySelectorAll('[role="tablist"][aria-label="Match date range"]')) {
+        const selected = tabs.querySelector('[role="tab"][aria-selected="true"]');
+        if (selected?.textContent.trim().toUpperCase() !== 'PAST') continue;
+        // Find the nearest schedule containing both the date tabs and day groups.
+        for (let scope = tabs.parentElement; scope && !scope.matches('body, #root'); scope = scope.parentElement) {
+          const lists = new Set();
+          for (const heading of scope.querySelectorAll('div.sticky')) {
+            const group = heading.parentElement;
+            if (matchDay(group) !== null) lists.add(group.parentElement);
+          }
+          if (!lists.size) continue;
+          for (const list of lists) {
+            if (Array.from(list.children).every(group => matchDay(group) !== null)) wanted.add(list);
+          }
+          break;
+        }
+      }
+    }
+    for (const list of new Set([...sortedDays, ...wanted])) {
+      if (!list.isConnected) { sortedDays.delete(list); continue; }
+      const groups = Array.from(list.children);
+      const dates = groups.map(matchDay);
+      if (dates.every(date => date !== null)) {
+        const direction = wanted.has(list) ? -1 : 1;
+        const ordered = groups.map((group, index) => ({group, date: dates[index]}))
+          .sort((a, b) => direction * (a.date - b.date));
+        // Keep the original nodes and parent so controls and delegated events survive.
+        ordered.forEach(({group}, index) => {
+          if (list.children[index] !== group) list.insertBefore(group, list.children[index]);
+        });
+      }
+      if (wanted.has(list)) sortedDays.add(list); else sortedDays.delete(list);
+    }
+  }
+  const matchCards = new Map();
+  function resolveMatchLink(link) {
+    link.dispatchEvent(new Event('esports-helper:resolve-match', {bubbles: true}));
+    try {
+      const url = new URL(link.getAttribute('href'), location.origin);
+      return url.origin === location.origin && /^\/(?:match|seasons\/view)\/[1-9]\d*$/.test(url.pathname) ? url.href : null;
+    } catch { return null; }
+  }
+  function matchTabControls() {
+    const wanted = new Set();
+    if (settings.matchNewTabs && /^\/(?:dashboard(?:\/.*)?)?$/i.test(location.pathname)) {
+      for (const card of document.querySelectorAll('main [role="button"]')) {
+        if (card.querySelector(seasonSelector) && card.querySelector(teamSelector) &&
+            card.querySelectorAll(seasonSelector).length === 1) wanted.add(card);
+      }
+    }
+    for (const [card, link] of matchCards) {
+      if (!wanted.has(card)) {
+        link.remove(); card.removeAttribute('data-esports-match-card'); matchCards.delete(card);
+      }
+    }
+    for (const card of wanted) {
+      let link = matchCards.get(card);
+      if (!link || link.parentElement !== card) {
+        link?.remove();
+        link = document.createElement('a'); link.dataset.esportsMatchLink = '';
+        link.target = '_blank'; link.rel = 'noopener noreferrer';
+        link.title = 'Open in new tab'; link.setAttribute('aria-label', 'Open match in new tab');
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('aria-hidden', 'true');
+        const path = document.createElementNS(svg.namespaceURI, 'path');
+        path.setAttribute('d', 'M14 3h7v7M21 3 10 14M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5');
+        svg.append(path); link.append(svg);
+        for (const type of ['click', 'auxclick']) link.addEventListener(type, event => {
+          event.stopPropagation();
+          if (!settings.matchNewTabs || !resolveMatchLink(link)) event.preventDefault();
+        });
+        link.addEventListener('keydown', event => event.stopPropagation());
+        card.append(link); matchCards.set(card, link);
+      }
+      const valid = Boolean(resolveMatchLink(link));
+      link.hidden = !valid;
+      card.toggleAttribute('data-esports-match-card', valid);
+    }
+  }
+  function openModifiedMatch(event) {
+    if (!settings?.matchNewTabs || !/^\/(?:dashboard(?:\/.*)?)?$/i.test(location.pathname)) return;
+    const modified = event.type === 'click' && event.button === 0 && (event.ctrlKey || event.metaKey);
+    const middle = (event.type === 'auxclick' || event.type === 'mousedown') && event.button === 1;
+    if (!modified && !middle) return;
+    const target = event.target instanceof Element ? event.target : null;
+    if (!target || target.closest('a, button, input, textarea, select, [contenteditable]:not([contenteditable="false"])')) return;
+    const card = target.closest('[role="button"]');
+    const link = matchCards.get(card);
+    if (!link || !resolveMatchLink(link)) return;
+    event.preventDefault(); event.stopImmediatePropagation();
+    // Suppress middle-button autoscroll on press; open once on release.
+    if (event.type !== 'mousedown') link.click();
+  }
+  for (const type of ['click', 'auxclick', 'mousedown']) document.addEventListener(type, openModifiedMatch, true);
   function trimURL(raw) {
     let url = raw.replace(/[.,!?;:]+$/g, '');
     for (const [open, close] of [['(', ')'], ['[', ']'], ['{', '}']]) {
@@ -139,12 +247,12 @@
     }
   }
   const observer = new MutationObserver(schedule);
-  function watch() { observer.observe(document.body, {childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['href', 'class', 'hidden']}); }
+  function watch() { observer.observe(document.body, {childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['href', 'class', 'hidden', 'aria-selected']}); }
   function run() {
     timer = null;
     if (!settings) return;
     observer.disconnect();
-    try { colorRows(); chatLinks(); placeChat(); roomForTeamNames(); }
+    try { matchTabControls(); orderPastDays(); colorRows(); chatLinks(); placeChat(); roomForTeamNames(); }
     finally { watch(); }
   }
   function schedule() { if (!timer) timer = setTimeout(run, 100); }

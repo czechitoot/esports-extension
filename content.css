@@ -19,3 +19,16 @@ a[data-esports-link]:focus-visible { outline: 2px solid currentColor; outline-of
   word-break: normal !important;
   text-overflow: clip !important;
 }
+/* Reserve a separate hit target at the end of each Dashboard match card. */
+[data-esports-match-card] { position: relative; padding-right: 44px !important; }
+[data-esports-match-card] > svg.pointer-events-none { display: none; }
+a[data-esports-match-link] {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 36px; border-radius: 5px;
+  color: #64748b !important; background: #f1f5f9; text-decoration: none;
+}
+a[data-esports-match-link][hidden] { display: none; }
+a[data-esports-match-link]:hover { color: #334155 !important; background: #e2e8f0; }
+a[data-esports-match-link]:focus-visible { outline: 2px solid #64748b; outline-offset: 2px; }
+a[data-esports-match-link] svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }

@@ -20,8 +20,10 @@ globalThis.EsportsHelper = (() => {
     ],
     linkify: true,
     moveChat: false,
-    unsquish: true,
+    unsquish: false,
     colorMatches: true,
+    newestPastDays: false,
+    matchNewTabs: false,
     bookmarks: [
       {name: 'Match dashboard', url: matchSite.origin},
       {name: 'Smash Helper', url: 'https://smashhelper.link'}
@@ -40,7 +42,9 @@ globalThis.EsportsHelper = (() => {
       bookmarks: Array.isArray(value.bookmarks) ? value.bookmarks.filter(b => b && typeof b.name === 'string' && b.name.trim() && safeURL(b.url)).map(b => ({name: bookmarkName(b), url: b.url})) : structuredClone(defaults.bookmarks),
       linkify: typeof value.linkify === 'boolean' ? value.linkify : true,
       moveChat: typeof value.moveChat === 'boolean' ? value.moveChat : false,
-      unsquish: typeof value.unsquish === 'boolean' ? value.unsquish : true,
+      unsquish: typeof value.unsquish === 'boolean' ? value.unsquish : false,
+      newestPastDays: typeof value.newestPastDays === 'boolean' ? value.newestPastDays : false,
+      matchNewTabs: typeof value.matchNewTabs === 'boolean' ? value.matchNewTabs : false,
       colorMatches: typeof value.colorMatches === 'boolean' ? value.colorMatches : true
     };
   }

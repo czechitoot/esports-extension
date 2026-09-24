@@ -7,8 +7,8 @@ extension for Chrome/Chromium. Runtime files live at the repository root; icons
 live in `icons/`. No build step is currently required.
 
 - GitHub: https://github.com/czechitoot/esports-extension
-- Approved Chrome Web Store version: 0.1.0; working update: 0.1.1
-- Repository rename to esports-extension is requested; verify remote status.
+- Approved Chrome Web Store version: 0.1.0; working update: 0.1.2
+- Repository rename to esports-extension is complete.
 - Store: https://chromewebstore.google.com/detail/ijoihdmdnameopfehjlbcjlbpmebknfe
 - Distribution is intended to be unlisted.
 - The self-hosted CRX, update feed, installation page, and Google Admin deployment
@@ -49,7 +49,7 @@ setup. Do not rewrite tags or history without appropriate authorization.
   restricted to the existing match-site scope in the manifest. Settings use local browser storage.
 - No analytics, remote executable code, or server collection. Chat and match
   content are processed locally and are not stored.
-- Dashboard coloring is enabled by default. Match game-title substrings ignoring
+- Dashboard coloring is enabled by default. Match season and game-title substrings ignoring
   case, punctuation, and trademark symbols; first rule wins. Preserve deleted
   defaults. Target schedule rows via season and team links, including their muted
   backgrounds; do not color match pages.
@@ -59,8 +59,10 @@ setup. Do not rewrite tags or history without appropriate authorization.
 - Moving match chat below details is off by default. Move the original wrapper,
   preserve drafts, controls, and events, and use a marker to restore its position.
   Never clone the chat.
-- Unsquishing match details is enabled by default. Stack the team header below
+- Unsquishing match details is off by default. Stack the team header below
   560px of available width and restore side-by-side layout when space permits.
+- Past-match day reversal and Dashboard new-tab controls are off by default.
+  Only coloring and chat links ship enabled; preserve explicitly saved preferences.
 - Popup bookmarks precede a divider and Settings; links open in new tabs.
   Default bookmarks are Match dashboard (derived from the manifest site scope)
   and Smash Helper (https://smashhelper.link).

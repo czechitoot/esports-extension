@@ -7,9 +7,58 @@ function field(labelText, type, value) {
   const input = document.createElement('input'); input.type = type; input.value = value; input.required = true;
   label.append(input); return {label, input};
 }
+let draggedRule = null;
+const rules = document.getElementById('games');
+function ruleMoved(row) {
+  status.textContent = 'Unsaved changes. Rule moved to position ' + (Array.from(rules.children).indexOf(row) + 1) + '.';
+}
+function clearDropHints() {
+  for (const row of rules.children) row.classList.remove('drop-before', 'drop-after');
+}
+function addRuleControls(row, input) {
+  const controls = document.createElement('div'); controls.className = 'rule-controls';
+  const handle = document.createElement('button');
+  handle.type = 'button'; handle.className = 'rule-handle'; handle.textContent = '⠿'; handle.draggable = true;
+  handle.title = 'Drag to reorder, or focus this handle and use the Up and Down keys';
+  controls.append(handle);
+  handle.addEventListener('keydown', event => {
+    if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+    event.preventDefault();
+    const sibling = event.key === 'ArrowUp' ? row.previousElementSibling : row.nextElementSibling;
+    if (!sibling) return;
+    if (event.key === 'ArrowUp') sibling.before(row); else sibling.after(row);
+    ruleMoved(row); handle.focus();
+  });
+  const labelControls = () => {
+    const name = input.value.trim() || 'new rule';
+    handle.setAttribute('aria-label', 'Reorder ' + name);
+  };
+  input.addEventListener('input', labelControls); labelControls();
+  row.prepend(controls);
+  handle.addEventListener('dragstart', event => {
+    draggedRule = row;
+    event.dataTransfer.effectAllowed = 'move'; event.dataTransfer.setData('text/plain', 'game-color-rule');
+    event.dataTransfer.setDragImage(row, 20, 20); row.classList.add('dragging');
+  });
+  handle.addEventListener('dragend', () => {
+    row.classList.remove('dragging'); draggedRule = null; clearDropHints();
+  });
+  row.addEventListener('dragover', event => {
+    if (!draggedRule || draggedRule === row) return;
+    event.preventDefault(); event.dataTransfer.dropEffect = 'move'; clearDropHints();
+    row.classList.add(event.clientY < row.getBoundingClientRect().top + row.offsetHeight / 2 ? 'drop-before' : 'drop-after');
+  });
+  row.addEventListener('drop', event => {
+    if (!draggedRule || draggedRule === row) return;
+    event.preventDefault();
+    const moved = draggedRule;
+    if (event.clientY < row.getBoundingClientRect().top + row.offsetHeight / 2) row.before(moved); else row.after(moved);
+    clearDropHints(); ruleMoved(moved); moved.querySelector('.rule-handle').focus();
+  });
+}
 function addRow(kind, value = {}) {
   const row = document.createElement('div'); row.className = 'edit-row ' + kind;
-  const first = field(kind === 'games' ? 'Game title / match text' : 'Display name', 'text', value.title ?? value.name ?? '');
+  const first = field(kind === 'games' ? 'Season or game text' : 'Display name', 'text', value.title ?? value.name ?? '');
   const second = field(kind === 'games' ? 'Color' : 'URL', kind === 'games' ? 'color' : 'url', value.color ?? value.url ?? (kind === 'games' ? '#D6E7F5' : ''));
   first.input.maxLength = 200;
   second.input.addEventListener('input', () => second.input.setCustomValidity(''));
@@ -17,6 +66,7 @@ function addRow(kind, value = {}) {
   remove.setAttribute('aria-label', 'Delete ' + (value.title || value.name || (kind === 'games' ? 'game' : 'bookmark')));
   remove.addEventListener('click', () => { row.remove(); status.textContent = 'Unsaved changes'; });
   row.append(first.label, second.label, remove); document.getElementById(kind).append(row);
+  if (kind === 'games') addRuleControls(row, first.input);
   return first.input;
 }
 for (const [button, kind] of [['add-game', 'games'], ['add-bookmark', 'bookmarks']]) {
@@ -39,7 +89,7 @@ form.addEventListener('submit', async event => {
   }
   const save = document.getElementById('save-settings'); save.disabled = true;
   try {
-    await chrome.storage.local.set({settings: {games, bookmarks, linkify: document.getElementById('linkify').checked, moveChat: document.getElementById('moveChat').checked, unsquish: document.getElementById('unsquish').checked, colorMatches: document.getElementById('colorMatches').checked}});
+    await chrome.storage.local.set({settings: {games, bookmarks, matchNewTabs: document.getElementById('matchNewTabs').checked, newestPastDays: document.getElementById('newestPastDays').checked, linkify: document.getElementById('linkify').checked, moveChat: document.getElementById('moveChat').checked, unsquish: document.getElementById('unsquish').checked, colorMatches: document.getElementById('colorMatches').checked}});
     status.textContent = 'Saved. Open supported tabs update automatically.';
   } catch (error) { status.textContent = 'Could not save: ' + error.message; }
   finally { save.disabled = false; }
@@ -48,6 +98,8 @@ api.load().then(settings => {
   settings.games.forEach(value => addRow('games', value)); settings.bookmarks.forEach(value => addRow('bookmarks', value));
   document.getElementById('linkify').checked = settings.linkify; document.getElementById('moveChat').checked = settings.moveChat;
   document.getElementById('unsquish').checked = settings.unsquish; document.getElementById('colorMatches').checked = settings.colorMatches;
+  document.getElementById('newestPastDays').checked = settings.newestPastDays;
+  document.getElementById('matchNewTabs').checked = settings.matchNewTabs;
   document.getElementById('controls').disabled = false;
   document.getElementById('save-settings').disabled = false;
 }).catch(error => { document.getElementById('load-error').textContent = 'Could not load settings. Reopen this page. ' + error.message; });

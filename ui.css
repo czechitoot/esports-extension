@@ -26,3 +26,17 @@ button:hover { background: #e8f1f7; } button:disabled { opacity: .6; cursor: wai
 footer { display: flex; gap: 18px; align-items: center; } #status { font-size: 13px; } .privacy { font-size: 12px; }
 .popup { width: 280px; padding: 10px; background: white; } .popup button { display: block; width: 100%; text-align: left; border: 0; background: white; overflow-wrap: anywhere; } .popup button:hover { background: #edf4f8; } .popup p { padding: 0 12px; } hr { border: 0; border-top: 1px solid #d8e2e9; margin: 8px 0; }
 @media (max-width: 600px) { .settings { padding: 0 12px; } section { padding: 16px; } .bookmarks { grid-template-columns: 1fr; } footer { align-items: start; flex-direction: column; } }
+
+.games { grid-template-columns: auto minmax(130px, 1fr) 70px auto; }
+.rule-controls { display: flex; gap: 4px; }
+.rule-controls button { padding: 7px; min-width: 32px; }
+.rule-handle { cursor: grab; touch-action: none; }
+.rule-handle:active { cursor: grabbing; }
+.games.dragging { opacity: .5; }
+.games.drop-before { box-shadow: 0 -3px #176c92; }
+.games.drop-after { box-shadow: 0 3px #176c92; }
+@media (max-width: 600px) {
+  .games { grid-template-columns: minmax(0, 1fr) 70px; }
+  .games .rule-controls { grid-column: 1 / -1; }
+  .games .delete { grid-column: 1 / -1; justify-self: end; }
+}

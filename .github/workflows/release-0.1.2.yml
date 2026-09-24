@@ -1,0 +1,49 @@
+name: Publish Esports Helper 0.1.2
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/release-0.1.2.yml'
+permissions: {}
+jobs:
+  release:
+    if: github.repository_id == '1373835248'
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Validate and package 0.1.2
+        run: |
+          for source in settings.js content.js match-links.js options.js popup.js; do node --check "$source"; done
+          python3 - <<'PY'
+          import json, pathlib, struct, zipfile
+          manifest = json.loads(pathlib.Path('manifest.json').read_text())
+          assert manifest['name'] == 'Esports Helper'
+          assert manifest['version'] == '0.1.2'
+          assert manifest['permissions'] == ['storage']
+          scopes = manifest['content_scripts'][0]['matches']
+          assert all(script['matches'] == scopes for script in manifest['content_scripts'])
+          files = ['manifest.json', 'settings.js', 'content.js', 'match-links.js', 'content.css', 'popup.html', 'popup.js', 'options.html', 'options.js', 'ui.css']
+          for script in manifest['content_scripts']:
+              assert set(script.get('js', []) + script.get('css', [])) <= set(files)
+          for size in (16, 32, 48, 128):
+              path = f'icons/icon{size}.png'
+              assert struct.unpack('>II', pathlib.Path(path).read_bytes()[16:24]) == (size, size)
+              files.append(path)
+          pathlib.Path('outputs').mkdir(exist_ok=True)
+          with zipfile.ZipFile('outputs/esports-helper-0.1.2.zip', 'w', zipfile.ZIP_DEFLATED) as archive:
+              for path in files:
+                  archive.write(path)
+          PY
+      - name: Publish 0.1.2 as latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v0.1.2 outputs/esports-helper-0.1.2.zip \
+            --target "$GITHUB_SHA" --latest --title 'Esports Helper 0.1.2' \
+            --notes-file .github/release-0.1.2.md

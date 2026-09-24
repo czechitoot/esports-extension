@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Esports Helper",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Quality-of-life improvements for esports matches, including game colors, chat links, layout adjustments, and bookmarks.",
   "permissions": [
     "storage"
@@ -19,6 +19,16 @@
         "content.css"
       ],
       "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://app.fenworks.com/*"
+      ],
+      "js": [
+        "match-links.js"
+      ],
+      "world": "MAIN",
+      "run_at": "document_start"
     }
   ],
   "action": {
