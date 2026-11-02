@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3
+
+- Restore match colors and optional new-tab controls for playoff tournament cards, including mobile card coloring.
+
 ## 0.1.2
 
 - Show Past matches with newest days first, preserving match order within each day; disabled by default with a Settings switch.

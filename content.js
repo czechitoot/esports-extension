@@ -30,7 +30,9 @@
       }
     }
   }
-  const seasonSelector = 'a[href^="/seasons/view/"]:not([data-esports-match-link]), a[href^="https://app.fenworks.com/seasons/view/"]:not([data-esports-match-link])';
+  const competitionSelector = ['/seasons/view/', '/tournaments/view/']
+    .flatMap(path => [path, location.origin + path])
+    .map(path => `a[href^="${path}"]:not([data-esports-match-link])`).join(', ');
   const teamSelector = 'a[href^="/teams/"], a[href^="/team/"], a[href^="https://app.fenworks.com/teams/"], a[href^="https://app.fenworks.com/team/"]';
   function ink(hex) {
     const parts = hex.slice(1).match(/../g).map(x => parseInt(x, 16) / 255)
@@ -39,9 +41,9 @@
   }
   function colorRows() {
     const wanted = new Map();
-    // Match pages also contain season links; they are not schedule rows.
+    // Match pages also contain competition links; they are not schedule rows.
     if (settings.colorMatches && !/^\/match\//i.test(location.pathname)) {
-      for (const link of document.querySelectorAll(seasonSelector)) {
+      for (const link of document.querySelectorAll(competitionSelector)) {
         if (link.closest('nav, header, aside, [role="navigation"]')) continue;
         const title = api.normalize(link.textContent);
         const game = settings.games.find(g => title.includes(api.normalize(g.title)));
@@ -50,8 +52,14 @@
         for (let depth = 0; row && depth < 9; depth++, row = row.parentElement) {
           if (row.matches('body, main, #root, [role="main"]')) break;
           // Never let a match climb into the container holding multiple schedule rows.
-          if (row.querySelectorAll(seasonSelector).length > 1) break;
-          if (row.querySelector(teamSelector)) { wanted.set(row, game.color); break; }
+          if (row.querySelectorAll(competitionSelector).length > 1) break;
+          if (row.querySelector(teamSelector)) {
+            // Responsive cards contain separate mobile and desktop layouts.
+            // Paint their shared card, including playoff tournament cards.
+            const card = row.closest('[role="button"]');
+            if (card && card.querySelectorAll(competitionSelector).length === 1) row = card;
+            wanted.set(row, game.color); break;
+          }
         }
       }
     }
@@ -72,7 +80,7 @@
   const sortedDays = new Set();
   function matchDay(group) {
     const heading = group.firstElementChild;
-    if (!heading?.matches('div.sticky') || !group.querySelector(seasonSelector) ||
+    if (!heading?.matches('div.sticky') || !group.querySelector(competitionSelector) ||
         !group.querySelector(teamSelector)) return null;
     const match = /^(?:Sun|Mon|Tue|Wed|Thu|Fri|Sat) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{1,2}), (\d{4})$/.exec(heading.textContent.trim());
     if (!match) return null;
@@ -129,8 +137,8 @@
     const wanted = new Set();
     if (settings.matchNewTabs && /^\/(?:dashboard(?:\/.*)?)?$/i.test(location.pathname)) {
       for (const card of document.querySelectorAll('main [role="button"]')) {
-        if (card.querySelector(seasonSelector) && card.querySelector(teamSelector) &&
-            card.querySelectorAll(seasonSelector).length === 1) wanted.add(card);
+        if (card.querySelector(competitionSelector) && card.querySelector(teamSelector) &&
+            card.querySelectorAll(competitionSelector).length === 1) wanted.add(card);
       }
     }
     for (const [card, link] of matchCards) {

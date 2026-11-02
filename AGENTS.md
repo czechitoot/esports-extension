@@ -7,7 +7,7 @@ extension for Chrome/Chromium. Runtime files live at the repository root; icons
 live in `icons/`. No build step is currently required.
 
 - GitHub: https://github.com/czechitoot/esports-extension
-- Approved Chrome Web Store version: 0.1.0; working update: 0.1.2
+- Approved Chrome Web Store version: 0.1.0; working update: 0.1.3
 - Repository rename to esports-extension is complete.
 - Store: https://chromewebstore.google.com/detail/ijoihdmdnameopfehjlbcjlbpmebknfe
 - Distribution is intended to be unlisted.
